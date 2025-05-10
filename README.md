@@ -53,3 +53,78 @@ end
 ```lua
 variable = نام_تابع(آرگومان1, آرگومان2, ...)
 ```
+## توابع درجه اول (First-Class Functions)
+
+یکی از ویژگی‌های قدرتمند Lua این است که توابع در آن به عنوان مقادیر درجه اول در نظر گرفته می‌شوند. این بدان معناست که:
+
+* می‌توانید توابع را به متغیرها اختصاص دهید:
+```lua
+myFunction = function(x)
+  return x * 2
+end
+print(myFunction(5)) -- خروجی: 10
+```
+* می‌توانید توابع را به عنوان آرگومان به توابع دیگر ارسال کنید:
+```lua
+function applyOperation(func, value)
+  return func(value)
+end
+
+function square(x)
+  return x * x
+end
+
+result = applyOperation(square, 3)
+print(result) -- خروجی: 9
+```
+* می‌توانید توابع را از توابع دیگر برگردانید:
+```lua
+function createMultiplier(factor)
+  return function(x)
+    return x * factor
+  end
+end
+
+multiplyByThree = createMultiplier(3)
+print(multiplyByThree(4)) -- خروجی: 12
+```
+این ویژگی توابع درجه اول، امکان استفاده از الگوهای برنامه‌نویسی تابعی و ایجاد کدهای انعطاف‌پذیر و قدرتمند را فراهم می‌کند.
+## Closures
+هنگامی که یک تابع در داخل تابع دیگری تعریف می‌شود، تابع داخلی می‌تواند به متغیرهای محلی تابع بیرونی دسترسی داشته باشد، حتی پس از اینکه اجرای تابع بیرونی به پایان رسیده باشد. به این ترکیب از یک تابع و محیط پیرامون آن (متغیرهای محلی غیرمحصور) یک Closure گفته می‌شود.
+```lua
+function counter()
+  local count = 0
+  return function()
+    count = count + 1
+    return count
+  end
+end
+
+local myCounter = counter()
+print(myCounter()) -- خروجی: 1
+print(myCounter()) -- خروجی: 2
+```
+در این مثال، تابع داخلی به متغیر count که در تابع counter تعریف شده است دسترسی دارد و مقدار آن را در هر بار فراخوانی به‌روزرسانی می‌کند، حتی پس از اینکه تابع counter اجرا شده و به پایان رسیده است.
+
+این Closures برای ایجاد توابع با حافظه داخلی و پیاده‌سازی مفاهیمی مانند توابع مولد (generators) بسیار مفید هستند.
+
+## OOP در Lua
+
+زبان برنامه نویسی Lua به طور ذاتی یک زبان شیءگرا (Object-Oriented) نیست، اما امکان پیاده‌سازی مفاهیم OOP را از طریق جداول و توابع فراهم می‌کند. روش معمول برای شبیه‌سازی کلاس‌ها و اشیاء در Lua استفاده از جداول برای نگهداری داده‌ها (ویژگی‌ها) و توابع برای تعریف رفتارها (متدها) است.
+یک روش رایج برای ایجاد "اشیاء" استفاده از یک جدول به عنوان نمونه و یک جدول دیگر به عنوان "کلاس" است که شامل متدها می‌شود.
+```lua
+
+Rectangle = { area = function(self) return self.width * self.height end }
+-- تعریف یک "کلاس" ساده به نام Rectangle
+function Rectangle:new(width, height)
+  local obj = { width = width, height = height }
+  setmetatable(obj, { __index = self })
+  return obj
+end
+
+-- ایجاد یک شیء از نوع Rectangle
+local rect1 = Rectangle:new(10, 5)
+print(rect1:area()) -- خروجی: 50
+```
+در این مثال، Rectangle هم به عنوان یک جدول برای نگهداری متدها و هم به عنوان یک نوع "کلاس" عمل می‌کند. متد new یک شیء جدید ایجاد می‌کند و метаجدول آن را به Rectangle متصل می‌کند. استفاده از : در تعریف و فراخوانی متدها، آرگومان ضمنی self را به تابع ارسال می‌کند که به شیء مورد نظر اشاره دارد.
+
