@@ -118,7 +118,6 @@ Rectangle = { area = function(self) return self.width * self.height end }
 -- تعریف یک "کلاس" ساده به نام Rectangle
 function Rectangle:new(width, height)
   local obj = { width = width, height = height }
-  setmetatable(obj, { __index = self })
   return obj
 end
 
